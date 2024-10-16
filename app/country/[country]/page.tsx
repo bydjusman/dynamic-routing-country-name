@@ -1,8 +1,24 @@
 // app/country/[country]/page.tsx
 import { notFound } from 'next/navigation';
 
+// Define types for params and weather data
+interface Params {
+  params: {
+    country: string;
+  };
+}
+
+interface WeatherData {
+  main: {
+    temp: number;
+  };
+  weather: {
+    description: string;
+  }[];
+}
+
 // Helper function to fetch weather data
-async function fetchWeatherData(city) {
+async function fetchWeatherData(city: string): Promise<WeatherData | null> {
   const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
   const response = await fetch(
     `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
@@ -12,14 +28,14 @@ async function fetchWeatherData(city) {
     return null;
   }
 
-  return await response.json();
+  return (await response.json()) as WeatherData;
 }
 
-const CountryPage = async ({ params }) => {
+const CountryPage = async ({ params }: Params) => {
   const { country } = params;
 
   // Static data for countries
-  const countries = {
+  const countries: { [key: string]: { population: string; capital: string } } = {
     pakistan: {
       population: '220 million',
       capital: 'Islamabad',
